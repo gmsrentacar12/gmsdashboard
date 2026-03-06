@@ -21,13 +21,12 @@ body{
   color:#111827;
   height:100dvh;
   height:-webkit-fill-available;
-  overflow:hidden;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale
 }
 
 /* ─── SHELL ─────────────────────────────── */
-#app{display:flex;flex-direction:column;height:100dvh;height:-webkit-fill-available}
+#app{display:flex;flex-direction:column;height:100dvh;height:-webkit-fill-available;overflow:hidden}
 
 /* ─── TOPBAR ─────────────────────────────── */
 #topbar{
@@ -40,7 +39,7 @@ body{
   border-bottom:1px solid #eaecf0;
   position:relative;z-index:10
 }
-.tb-logo{height:32px;object-fit:contain;display:block}
+.tb-logo{height:28px;object-fit:contain;display:block}
 .tb-actions{display:flex;align-items:center;gap:6px}
 .tb-btn{
   background:none;border:1.5px solid #e5e7eb;border-radius:9px;
@@ -57,7 +56,7 @@ body{
   flex:1;overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   padding:16px;
-  padding-bottom:calc(70px + env(safe-area-inset-bottom))
+  padding-bottom:calc(80px + env(safe-area-inset-bottom))
 }
 
 /* ─── BOTTOM NAV ─────────────────────────── */
@@ -66,8 +65,9 @@ body{
   border-top:1px solid #eaecf0;
   display:flex;
   padding-bottom:env(safe-area-inset-bottom);
-  flex-shrink:0;
-  position:relative;z-index:10
+  position:fixed;
+  bottom:0;left:0;right:0;
+  z-index:200
 }
 .bnv{
   flex:1;display:flex;flex-direction:column;align-items:center;
@@ -107,8 +107,8 @@ body{
 }
 
 /* ─── SIDEBAR ─────────────────────────────── */
-.sb-logo{padding:18px 16px;border-bottom:1px solid #f3f4f6}
-.sb-logo img{height:40px;object-fit:contain}
+.sb-logo{padding:16px;border-bottom:1px solid #f3f4f6}
+.sb-logo img{height:36px;object-fit:contain}
 .sb-nav{padding:8px;flex:1;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
 .snvi{
   display:flex;align-items:center;gap:9px;padding:9px 11px;
@@ -320,7 +320,7 @@ body{
 /* ─── FAB ─────────────────────────────── */
 #cfab{
   position:fixed;right:16px;
-  bottom:calc(66px + env(safe-area-inset-bottom));
+  bottom:calc(68px + env(safe-area-inset-bottom));
   width:48px;height:48px;border-radius:50%;
   background:#e63232;border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
@@ -617,7 +617,14 @@ body{
   <div id="cmsgs">
     <div class="cmsg ca">Bonjou! Mwen se Asistan GMS Rent A Car. Kijan mwen ka ede ou jodi a? 🚗</div>
   </div>
+  <div id="cfile-preview" style="padding:0 12px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:0"></div>
   <div class="cp-inp">
+    <input type="file" id="cfile" accept="image/*,.pdf,.jpg,.jpeg,.png" style="display:none"
+      onchange="previewFile(this)"/>
+    <button onclick="document.getElementById('cfile').click()"
+      style="background:#f3f4f6;border:1.5px solid #e5e7eb;border-radius:9px;padding:9px 10px;
+      cursor:pointer;flex-shrink:0;font-size:16px;line-height:1;transition:all .15s"
+      title="Voye foto / PDF">📎</button>
     <input id="cinp" class="inp" style="font-size:13.5px;padding:10px 13px"
       placeholder="Ekri mesaj ou..."
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"/>
@@ -910,13 +917,39 @@ function toggleChat() {
 }
 async function sendChat() {
   var inp = document.getElementById('cinp');
-  var msg = inp.value.trim(); if (!msg) return; inp.value = '';
-  addMsg(msg,'user');
+  var fileInp = document.getElementById('cfile');
+  var files = fileInp ? fileInp.files : null;
+  var msg = inp.value.trim();
+  if (!msg && (!files || files.length === 0)) return;
+  inp.value = '';
+  // Show user message with file preview if any
+  var fileHtml = '';
+  if (files && files.length > 0) {
+    var f = files[0];
+    if (f.type.startsWith('image/')) {
+      var objUrl = URL.createObjectURL(f);
+      fileHtml = '<br><img src="'+objUrl+'" style="max-width:180px;max-height:120px;border-radius:8px;margin-top:6px;display:block"/>';
+    } else {
+      fileHtml = '<br><span style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);padding:4px 8px;border-radius:6px;font-size:11px;margin-top:4px">📎 '+f.name+'</span>';
+    }
+    fileInp.value = '';
+    document.getElementById('cfile-preview').innerHTML = '';
+  }
+  addMsg(msg||'📎 Fichye voye', 'user', fileHtml);
   var tid = addTyping();
   if (!CFG.n8nUrl) { rmTyping(tid); addMsg('⚠ Konfigire URL n8n la nan Paramèt.','ai'); return; }
   try {
-    var res = await fetch(CFG.n8nUrl,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({chatInput:msg,sessionId:getSess()})});
+    var res, reqMsg = msg || (files && files.length > 0 ? 'Analize fichye sa a pou mwen.' : '');
+    if (files && files.length > 0) {
+      var fd = new FormData();
+      fd.append('chatInput', reqMsg);
+      fd.append('sessionId', getSess());
+      fd.append('files', files[0]);
+      res = await fetch(CFG.n8nUrl, {method:'POST', body:fd});
+    } else {
+      res = await fetch(CFG.n8nUrl,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({chatInput:reqMsg,sessionId:getSess()})});
+    }
     var d = await res.json();
     rmTyping(tid);
     var reply = d.output||d.text||d.message||d.response||(Array.isArray(d)&&d[0]&&d[0].output)||JSON.stringify(d);
@@ -925,13 +958,52 @@ async function sendChat() {
       setTimeout(refreshData,2000);
   } catch(ex) { rmTyping(tid); addMsg('❌ Erè koneksyon ak n8n.','ai'); }
 }
-function addMsg(txt, role) {
+function renderMsg(txt) {
+  // Convert PDF/Drive export links to download buttons
+  txt = txt.replace(/(https?:\/\/docs\.google\.com\/document\/d\/([\w-]+)\/export\?format=pdf[^\s<"]*)/g,
+    '<a href="$1" target="_blank" download style="display:inline-flex;align-items:center;gap:6px;background:#e63232;color:#fff;padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;margin:4px 0;">📥 Telechaje PDF</a>');
+  // Google Drive view links
+  txt = txt.replace(/(https?:\/\/drive\.google\.com\/file\/d\/[^\s<"]+)/g,
+    '<a href="$1" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#e63232;color:#fff;padding:7px 14px;border-radius:9px;font-size:12px;font-weight:600;text-decoration:none;margin:4px 0;">📄 Wè PDF</a>');
+  // Regular links
+  txt = txt.replace(/(https?:\/\/(?!docs\.google|drive\.google)[^\s<"]+)/g,
+    '<a href="$1" target="_blank" style="color:#e63232;text-decoration:underline;word-break:break-all">$1</a>');
+  return txt;
+}
+function addMsg(txt, role, fileHtml) {
   var box = document.getElementById('cmsgs');
   var d = document.createElement('div');
   d.className = 'cmsg '+(role==='user'?'cu':'ca');
-  d.innerHTML = txt.replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,
-    '<a href="$1" target="_blank" style="color:#cc2222;text-decoration:underline;word-break:break-all">$1</a>');
+  var content = txt.replace(/\n/g,'<br>');
+  if (role !== 'user') content = renderMsg(content);
+  d.innerHTML = content + (fileHtml||'');
   box.appendChild(d); box.scrollTop = box.scrollHeight;
+  return d;
+}
+function previewFile(inp) {
+  var prev = document.getElementById('cfile-preview');
+  prev.innerHTML = '';
+  if (!inp.files || !inp.files[0]) return;
+  var f = inp.files[0];
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;align-items:center;gap:6px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:5px 10px;font-size:11.5px;color:#dc2626;margin:4px 12px 0';
+  if (f.type.startsWith('image/')) {
+    var img = document.createElement('img');
+    img.src = URL.createObjectURL(f);
+    img.style.cssText = 'width:36px;height:36px;object-fit:cover;border-radius:5px';
+    wrap.appendChild(img);
+  } else {
+    wrap.innerHTML = '📄 ';
+  }
+  var name = document.createElement('span');
+  name.textContent = f.name.length > 28 ? f.name.slice(0,25)+'...' : f.name;
+  wrap.appendChild(name);
+  var rm = document.createElement('button');
+  rm.innerHTML = '✕';
+  rm.style.cssText = 'background:none;border:none;cursor:pointer;color:#dc2626;font-size:13px;padding:0 0 0 4px;line-height:1;margin-left:auto';
+  rm.onclick = function(){ document.getElementById('cfile').value=''; prev.innerHTML=''; };
+  wrap.appendChild(rm);
+  prev.appendChild(wrap);
 }
 function addTyping() {
   var id='t'+Date.now(); var box=document.getElementById('cmsgs');
