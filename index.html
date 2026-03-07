@@ -353,6 +353,7 @@ body{
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#e5e7eb;border-radius:99px}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="app">
@@ -390,7 +391,7 @@ body{
       <div class="snvi" id="snv-contrat" onclick="sp('contrat')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         Kontra
-        <span class="sb-badge">Beta</span>
+        <span class="sb-badge" style="background:#dcfce7;color:#16a34a;border-color:#86efac">✓</span>
       </div>
     </nav>
 
@@ -504,7 +505,7 @@ body{
           </div>
         </div>
         <div class="tw"><table class="tbl">
-          <thead><tr><th>Kliyan</th><th>Machin</th><th>Dat</th><th>Jou</th><th>Total</th><th>Estati</th><th>PDF</th></tr></thead>
+          <thead><tr><th>Kliyan</th><th>Machin</th><th>Dat</th><th>Jou</th><th>Total</th><th>Estati</th><th>PDF</th><th>Aksyon</th></tr></thead>
           <tbody id="tb-proformas"><tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:24px;font-size:12px">Chajman...</td></tr></tbody>
         </table></div>
       </div></div>
@@ -538,21 +539,147 @@ body{
       </div></div>
 
       <!-- CONTRAT -->
-      <div id="pg-contrat" class="page hidden"><div class="card cs">
-        <div style="font-size:44px">🚧</div>
-        <div style="font-size:17px;font-weight:700;color:#111827">Kontra — Andevelopman</div>
-        <div style="font-size:12.5px;color:#9ca3af;max-width:240px;line-height:1.6;text-align:center">N ap travay sou fonksyon kontra yo. Mèsi pou pasyans ou!</div>
-        <span class="bdg by" style="font-size:11.5px;padding:5px 12px;margin-top:4px">⏳ Byento disponib</span>
-        <div class="cs-feat">
-          <div class="cs-feat-title">Fonksyon k ap vini</div>
-          <div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:#6b7280">
-            <div>📄 Jenerasyon kontra otomatik</div>
-            <div>✍️ Siyati elektwonik</div>
-            <div>📬 Voye pa WhatsApp / Email</div>
-            <div>🗂 Achiv kontra siyen</div>
+      <div id="pg-contrat" class="page hidden">
+
+  <!-- WIZARD HEADER -->
+  <div style="margin-bottom:16px">
+    <div style="font-size:17px;font-weight:700;color:#111827;margin-bottom:4px">📋 Kontra Lokasyon</div>
+    <div style="display:flex;gap:0;background:#f3f4f6;border-radius:10px;padding:3px;max-width:360px">
+      <button id="ctab-1" onclick="cStep(1)" style="flex:1;padding:6px 8px;border:none;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .2s;background:#e63232;color:#fff;font-family:inherit">1 · Detay</button>
+      <button id="ctab-2" onclick="cStep(2)" style="flex:1;padding:6px 8px;border:none;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:#6b7280;font-family:inherit">2 · Kontra</button>
+      <button id="ctab-3" onclick="cStep(3)" style="flex:1;padding:6px 8px;border:none;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:#6b7280;font-family:inherit">3 · Siyati</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: FORM -->
+  <div id="cst-1">
+    <div style="display:grid;grid-template-columns:1fr;gap:12px" id="cst1-grid">
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">👤 Kliyan</div>
+        <div style="margin-bottom:10px">
+          <label class="lbl">Chwazi kliyan</label>
+          <select id="c-client" class="inp" style="padding:10px 13px" onchange="cUpdateClient()">
+            <option value="">— Chwazi —</option>
+          </select>
+        </div>
+        <div id="c-client-info" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:10px 12px;font-size:12px;color:#374151;line-height:1.7"></div>
+        <div style="margin-top:10px">
+          <label class="lbl">Nimewo Permis Kondui</label>
+          <input id="c-permis" class="inp" placeholder="Nimewo permis (opsyonèl)"/>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">🚗 Machin</div>
+        <div style="margin-bottom:10px">
+          <label class="lbl">Chwazi machin</label>
+          <select id="c-vehicle" class="inp" style="padding:10px 13px" onchange="cUpdateVehicle()">
+            <option value="">— Chwazi —</option>
+          </select>
+        </div>
+        <div id="c-vehicle-info" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:10px 12px;font-size:12px;color:#374151;line-height:1.7"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+          <div>
+            <label class="lbl">Nivo Gaz Depa</label>
+            <select id="c-fuel" class="inp" style="padding:9px 13px">
+              <option value="Plein">Plèn</option>
+              <option value="3/4">3/4</option>
+              <option value="1/2">1/2</option>
+              <option value="1/4">1/4</option>
+              <option value="Vide">Vid</option>
+            </select>
+          </div>
+          <div>
+            <label class="lbl">Km Aktyèl</label>
+            <input id="c-km" class="inp" type="number" placeholder="ex: 45000"/>
           </div>
         </div>
-      </div></div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px">📅 Dat &amp; Pri</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label class="lbl">Dat Kòmansman</label>
+            <input id="c-start" class="inp" type="date" onchange="cCalc()"/>
+          </div>
+          <div>
+            <label class="lbl">Dat Retou</label>
+            <input id="c-end" class="inp" type="date" onchange="cCalc()"/>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div>
+            <label class="lbl">Pri / Jou (HTG)</label>
+            <input id="c-price" class="inp" type="number" placeholder="ex: 5000" oninput="cCalc()"/>
+          </div>
+          <div>
+            <label class="lbl">Garanti (HTG)</label>
+            <input id="c-depot" class="inp" type="number" placeholder="ex: 10000"/>
+          </div>
+        </div>
+        <div id="c-calc" style="display:none;background:#f0fdf4;border:1px solid #86efac;border-radius:9px;padding:10px 12px;font-size:12.5px;color:#166534;line-height:1.8"></div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px">📝 Kondisyon</div>
+        <div style="margin-bottom:10px">
+          <label class="lbl">Km Enkli / Jou</label>
+          <input id="c-kmday" class="inp" placeholder="ex: 200 km (opsyonèl)"/>
+        </div>
+        <div>
+          <label class="lbl">Obsèvasyon / Kondisyon Espesyal</label>
+          <textarea id="c-obs" class="inp" rows="3" placeholder="Dega vizib, rèy gratel, elatriye..." style="resize:vertical"></textarea>
+        </div>
+      </div>
+    </div>
+    <button class="btn-r" style="width:100%;margin-top:14px;padding:13px;font-size:14px;border-radius:12px" onclick="cGoStep2()">
+      Kontinye → Wè Kontra
+    </button>
+  </div>
+
+  <!-- STEP 2: CONTRACT PREVIEW -->
+  <div id="cst-2" style="display:none">
+    <div id="contract-preview" style="background:#fff;border:1px solid #e8eaf0;border-radius:12px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.06)">
+      <!-- rendered by renderContract() -->
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-g" onclick="cStep(1)" style="flex:1">← Retounen</button>
+      <button class="btn-r" style="flex:2;border-radius:10px;padding:12px" onclick="cGoStep3()">Ale Siyati →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: SIGNATURES -->
+  <div id="cst-3" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr;gap:12px">
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">✍️ Siyati Kliyan</div>
+        <div style="font-size:11.5px;color:#9ca3af;margin-bottom:10px">Siyen nan bwat la anba a ak dwèt ou</div>
+        <div style="position:relative;border:2px solid #e5e7eb;border-radius:10px;overflow:hidden;touch-action:none;background:#fafafa">
+          <canvas id="sig-client" style="display:block;width:100%;height:160px;cursor:crosshair"></canvas>
+          <div id="sig-client-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#d1d5db;font-size:13px;font-style:italic">Siyen la...</div>
+        </div>
+        <button onclick="clearSig('client')" class="btn-g" style="margin-top:8px;padding:7px 14px;font-size:12px">🗑 Efase</button>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">✍️ Siyati Louè (GMS)</div>
+        <div style="font-size:11.5px;color:#9ca3af;margin-bottom:10px">Siyati ajã GMS Rent A Car</div>
+        <div style="position:relative;border:2px solid #e5e7eb;border-radius:10px;overflow:hidden;touch-action:none;background:#fafafa">
+          <canvas id="sig-loueur" style="display:block;width:100%;height:160px;cursor:crosshair"></canvas>
+          <div id="sig-loueur-hint" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;color:#d1d5db;font-size:13px;font-style:italic">Siyen la...</div>
+        </div>
+        <button onclick="clearSig('loueur')" class="btn-g" style="margin-top:8px;padding:7px 14px;font-size:12px">🗑 Efase</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-g" onclick="cStep(2)" style="flex:1">← Retounen</button>
+      <button class="btn-r" id="btn-gen-pdf" style="flex:2;border-radius:10px;padding:12px;font-size:14px" onclick="cGeneratePDF()">
+        📄 Jenere &amp; Sove PDF
+      </button>
+    </div>
+  </div>
+
+</div>
 
     </div><!-- /parea -->
   </div><!-- /main-c -->
@@ -646,7 +773,7 @@ body{
         <span style="font-size:22px">📋</span>
         <div style="display:flex;align-items:center;gap:6px">
           <span style="font-size:14px;font-weight:500;color:#111827">Kontra</span>
-          <span class="bdg by" style="font-size:9px;padding:1px 5px">Beta</span>
+          <span style="font-size:9px;padding:1px 5px;background:#dcfce7;color:#16a34a;border-radius:99px;border:1px solid #86efac;font-weight:700">✓</span>
         </div>
         <svg style="margin-left:auto;color:#d1d5db" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
@@ -742,8 +869,8 @@ function sp(name) {
   var mnv = document.getElementById('mnv-'+name);
   if (mnv) mnv.classList.add('on');
   var m = PM[name]||{t:name,s:''};
-  document.getElementById('ptitle').textContent = m.t;
-  document.getElementById('psub').textContent   = m.s;
+  var _pt=document.getElementById('ptitle');if(_pt)_pt.textContent=m.t;
+  var _ps=document.getElementById('psub');if(_ps)_ps.textContent=m.s;
   if (sbClient && name !== 'contrat') loadPg(name);
 }
 
@@ -756,6 +883,7 @@ function refreshData() {
 }
 function loadPg(n) {
   if (n === 'dashboard') loadDash();
+  else if (n === 'contrat') { cLoadSelects(); }
   else loadTbl(n);
 }
 async function buildCC() {
@@ -836,14 +964,42 @@ function rVh(rows) {
 }
 function rPr(rows) {
   var tb=document.getElementById('tb-proformas');
-  if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#5a5a6a;padding:20px;font-size:11.5px">Okenn proforma</td></tr>';return;}
+  if(!rows.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:20px;font-size:12px">Okenn proforma</td></tr>';return;}
   tb.innerHTML=rows.map(function(r){
-    var c=CC.clients[r.client_id]||{name:(r.client_id||'').slice(0,6)+'…'};
-    var v=CC.vehicles[r.vehicle_id]||{model:'—',plate:'—'};
-    var pdf=r.pdf_url?'<a href="'+e(r.pdf_url)+'" target="_blank" class="bdg bb" style="font-size:9.5px">📄 PDF</a>':'<span style="color:#5a5a6a;font-size:10.5px">—</span>';
-    return '<tr><td style="color:#fff;font-weight:500">'+e(c.name)+'</td><td style="color:#8a8a9a;font-size:11px">'+e(v.model)+'</td><td style="color:#5a5a6a;font-size:10.5px">'+fD(r.start_date)+'</td><td style="text-align:center">'+( r.duration_days||'—')+'</td><td style="color:#cc2222;font-weight:500">'+fH(r.total_amount)+'</td><td>'+sB(r.status)+'</td><td>'+pdf+'</td></tr>';
+    var c=CC.clients[r.client_id]||{name:(r.client_id||'').slice(0,6)+'...'};
+    var v=CC.vehicles[r.vehicle_id]||{model:'--',plate:'--'};
+    var pdf=r.pdf_url?'<a href="'+e(r.pdf_url)+'" target="_blank" class="bdg bb" style="font-size:9.5px">PDF</a>':'<span style="color:#9ca3af;font-size:10.5px">-</span>';
+    var rid=r.id||'';
+    var rc=r.client_id||'';var rv=r.vehicle_id||'';
+    var rs=r.start_date||'';var rd=r.duration_days||0;var rp=r.daily_price||0;
+    var kontra='<button onclick="cFromProforma(\''+rid+'\',\''+rc+'\',\''+rv+'\',\''+rs+'\','+rd+','+rp+')" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:4px 9px;font-size:9.5px;font-weight:600;cursor:pointer;font-family:inherit">Kontra</button>';
+    return '<tr><td style="font-weight:500">'+e(c.name)+'</td><td style="color:#6b7280;font-size:11px">'+e(v.model)+'</td><td style="color:#6b7280;font-size:10.5px">'+fD(r.start_date)+'</td><td style="text-align:center">'+(r.duration_days||'-')+'</td><td style="color:#e63232;font-weight:500">'+fH(r.total_amount)+'</td><td>'+sB(r.status)+'</td><td>'+pdf+'</td><td>'+kontra+'</td></tr>';
   }).join('');
 }
+function cFromProforma(proId, clientId, vehicleId, startDate, durationDays, dailyPrice) {
+  sp('contrat');
+  setTimeout(async function(){
+    await cLoadSelects();
+    var cs=document.getElementById('c-client');
+    if(cs && clientId){ cs.value=clientId; cUpdateClient(); }
+    var vs=document.getElementById('c-vehicle');
+    if(vs && vehicleId){ vs.value=vehicleId; cUpdateVehicle(); }
+    if(startDate){
+      var sd=document.getElementById('c-start');
+      if(sd) sd.value=startDate;
+      if(durationDays){
+        var d=new Date(startDate);
+        d.setDate(d.getDate()+parseInt(durationDays));
+        var ed=document.getElementById('c-end');
+        if(ed) ed.value=d.toISOString().split('T')[0];
+      }
+    }
+    if(dailyPrice){ var pp=document.getElementById('c-price'); if(pp) pp.value=dailyPrice; }
+    cCalc();
+    cStep(1);
+  }, 400);
+}
+
 function rIn(rows) {
   var tb=document.getElementById('tb-invoices');
   if(!rows.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:#5a5a6a;padding:20px;font-size:11.5px">Okenn facture</td></tr>';return;}
@@ -971,6 +1127,403 @@ function addTyping() {
   box.appendChild(d); box.scrollTop=box.scrollHeight; return id;
 }
 function rmTyping(id){ var el=document.getElementById(id); if(el)el.remove(); }
+
+// ══════════════════════════════════════════
+//  CONTRACT MODULE
+// ══════════════════════════════════════════
+var CDATA = {
+  clientId:'', clientName:'', clientPhone:'', clientAddr:'', clientPermis:'',
+  vehicleId:'', vehicleModel:'', vehiclePlate:'', vehicleColor:'',
+  startDate:'', endDate:'', days:0, dailyPrice:0, totalHtg:0, tca:0, totalGen:0,
+  depot:0, fuel:'Plein', kmStart:0, kmDay:'', obs:'',
+  contractNum:'', sigClient:null, sigLoueur:null
+};
+
+async function cLoadSelects() {
+  if (!sbClient) return;
+  // Clients
+  var cs = document.getElementById('c-client'); if (!cs) return;
+  cs.innerHTML = '<option value="">— Chwazi —</option>';
+  var {data:cl} = await sbClient.from('clients').select('id,name,phone,address').order('name');
+  if (cl) cl.forEach(function(c){
+    var o = document.createElement('option'); o.value=c.id;
+    o.textContent=c.name; o.dataset.phone=c.phone||''; o.dataset.addr=c.address||'';
+    cs.appendChild(o);
+  });
+  // Vehicles (available only)
+  var vs = document.getElementById('c-vehicle'); if (!vs) return;
+  vs.innerHTML = '<option value="">— Chwazi —</option>';
+  var {data:vl} = await sbClient.from('vehicles').select('id,model,plate,color,status').order('model');
+  if (vl) vl.forEach(function(v){
+    var o = document.createElement('option'); o.value=v.id;
+    o.textContent=v.model+' — '+v.plate+(v.status!=='available'?' ('+v.status+')':'');
+    o.dataset.model=v.model||''; o.dataset.plate=v.plate||''; o.dataset.color=v.color||'';
+    o.disabled = (v.status !== 'available');
+    vs.appendChild(o);
+  });
+}
+
+function cUpdateClient() {
+  var sel = document.getElementById('c-client');
+  var opt = sel.options[sel.selectedIndex];
+  var info = document.getElementById('c-client-info');
+  if (!sel.value) { info.style.display='none'; return; }
+  CDATA.clientId = sel.value; CDATA.clientName = opt.text;
+  CDATA.clientPhone = opt.dataset.phone; CDATA.clientAddr = opt.dataset.addr;
+  info.style.display='block';
+  info.innerHTML = '<b>'+opt.text+'</b><br>📞 '+(opt.dataset.phone||'—')+'<br>📍 '+(opt.dataset.addr||'—');
+}
+
+function cUpdateVehicle() {
+  var sel = document.getElementById('c-vehicle');
+  var opt = sel.options[sel.selectedIndex];
+  var info = document.getElementById('c-vehicle-info');
+  if (!sel.value) { info.style.display='none'; return; }
+  CDATA.vehicleId = sel.value; CDATA.vehicleModel = opt.dataset.model;
+  CDATA.vehiclePlate = opt.dataset.plate; CDATA.vehicleColor = opt.dataset.color;
+  info.style.display='block';
+  info.innerHTML = '<b>'+opt.dataset.model+'</b>  🏷 '+opt.dataset.plate+'<br>🎨 '+(opt.dataset.color||'—');
+}
+
+function cCalc() {
+  var s=document.getElementById('c-start').value;
+  var e=document.getElementById('c-end').value;
+  var p=parseFloat(document.getElementById('c-price').value)||0;
+  var calc=document.getElementById('c-calc');
+  if (!s||!e||!p) { calc.style.display='none'; return; }
+  var d1=new Date(s), d2=new Date(e);
+  var days=Math.max(1,Math.round((d2-d1)/(1000*60*60*24)));
+  var total=days*p;
+  var tca=Math.round(total*0.10);
+  var gen=total+tca;
+  CDATA.startDate=s; CDATA.endDate=e; CDATA.days=days;
+  CDATA.dailyPrice=p; CDATA.totalHtg=total; CDATA.tca=tca; CDATA.totalGen=gen;
+  calc.style.display='block';
+  calc.innerHTML='<b>'+days+' jou</b> × '+fmt(p)+' HTG = <b>'+fmt(total)+' HTG</b>'
+    +'<br>TCA (10%): '+fmt(tca)+' HTG<br><b>Total Jeneral: '+fmt(gen)+' HTG</b>';
+}
+
+function fmt(n){return Number(n).toLocaleString('fr-HT');}
+function fmtDate(s){
+  if(!s)return'—';
+  var p=s.split('-');
+  return p[2]+'/'+p[1]+'/'+p[0];
+}
+
+function cGoStep2() {
+  if (!CDATA.clientId){alert('Chwazi yon kliyan!');return;}
+  if (!CDATA.vehicleId){alert('Chwazi yon machin!');return;}
+  if (!CDATA.startDate||!CDATA.endDate){alert('Antre dat yo!');return;}
+  if (!CDATA.dailyPrice){alert('Antre pri pa jou!');return;}
+  CDATA.clientPermis = document.getElementById('c-permis').value.trim();
+  CDATA.depot = parseFloat(document.getElementById('c-depot').value)||0;
+  CDATA.fuel = document.getElementById('c-fuel').value;
+  CDATA.kmStart = document.getElementById('c-km').value||'—';
+  CDATA.kmDay = document.getElementById('c-kmday').value||'Ilimite';
+  CDATA.obs = document.getElementById('c-obs').value||'Okenn obsèvasyon.';
+  renderContract();
+  cStep(2);
+}
+
+function cGoStep3() {
+  cStep(3);
+  setTimeout(function(){initSigPads();},100);
+}
+
+function cStep(n) {
+  [1,2,3].forEach(function(i){
+    document.getElementById('cst-'+i).style.display = i===n?'block':'none';
+    var tb=document.getElementById('ctab-'+i);
+    tb.style.background = i===n?'#e63232':'transparent';
+    tb.style.color = i===n?'#fff':'#6b7280';
+  });
+  if (n===1) cLoadSelects();
+  window.scrollTo(0,0);
+}
+
+function renderContract() {
+  var today = new Date();
+  var todayStr = String(today.getDate()).padStart(2,'0')+'/'+String(today.getMonth()+1).padStart(2,'0')+'/'+today.getFullYear();
+  var num = 'CON-'+today.getFullYear()+'-XXX'; // will be replaced on save
+  CDATA.contractNum = num;
+
+  var html = '<div style="font-family:Georgia,serif;max-width:680px;margin:0 auto;padding:0">'
+
+  // Header band
+  +'<div style="background:linear-gradient(135deg,#cc2222,#991111);padding:22px 24px;display:flex;align-items:center;gap:16px">'
+  +'<div style="flex:1"><div style="color:#fff;font-size:20px;font-weight:700;letter-spacing:.02em">CONTRAT DE LOCATION</div>'
+  +'<div style="color:rgba(255,255,255,.75);font-size:12px;margin-top:2px">GMS Rent A Car — '+todayStr+'</div></div>'
+  +'<div style="background:rgba(255,255,255,.15);padding:8px 16px;border-radius:8px;text-align:right">'
+  +'<div style="color:rgba(255,255,255,.6);font-size:10px;text-transform:uppercase;letter-spacing:.1em">N°</div>'
+  +'<div style="color:#fff;font-size:16px;font-weight:700">'+num+'</div></div>'
+  +'</div>'
+
+  // Body
+  +'<div style="padding:20px 24px">'
+
+  // 2-col info
+  +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">'
+  // Client card
+  +'<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px">'
+  +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">👤 Lokatè</div>'
+  +'<div style="font-size:13.5px;font-weight:700;color:#111827;margin-bottom:4px">'+CDATA.clientName+'</div>'
+  +'<div style="font-size:12px;color:#6b7280;line-height:1.8">'
+  +'📞 '+CDATA.clientPhone+'<br>'
+  +'📍 '+CDATA.clientAddr+'<br>'
+  +(CDATA.clientPermis?'🪪 Permis: '+CDATA.clientPermis:'')
+  +'</div></div>'
+  // Vehicle card
+  +'<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:14px">'
+  +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:10px">🚗 Veyikil</div>'
+  +'<div style="font-size:13.5px;font-weight:700;color:#111827;margin-bottom:4px">'+CDATA.vehicleModel+'</div>'
+  +'<div style="font-size:12px;color:#6b7280;line-height:1.8">'
+  +'🏷 Plak: <b style=\"color:#cc2222;font-family:monospace\">'+CDATA.vehiclePlate+'</b><br>'
+  +'🎨 '+CDATA.vehicleColor+'<br>'
+  +'⛽ Gaz depa: '+CDATA.fuel+' · Km: '+CDATA.kmStart
+  +'</div></div>'
+  +'</div>'
+
+  // Rental terms table
+  +'<div style="border:1.5px solid #e5e7eb;border-radius:10px;overflow:hidden;margin-bottom:18px">'
+  +'<div style="background:#f3f4f6;padding:10px 16px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#6b7280">📅 Kondisyon Lokasyon</div>'
+  +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">'
+  +cInfoCell('Dat Depa','📅 '+fmtDate(CDATA.startDate))
+  +cInfoCell('Dat Retou','📅 '+fmtDate(CDATA.endDate))
+  +cInfoCell('Dirasyon','🗓 '+CDATA.days+' jou')
+  +cInfoCell('Pri / Jou','💰 '+fmt(CDATA.dailyPrice)+' HTG')
+  +cInfoCell('Km Enkli / Jou','🛣 '+CDATA.kmDay)
+  +cInfoCell('Garanti','🔒 '+fmt(CDATA.depot)+' HTG')
+  +'</div></div>'
+
+  // Financial summary
+  +'<div style="background:#fff8f8;border:1.5px solid #fecaca;border-radius:10px;padding:16px;margin-bottom:18px">'
+  +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;margin-bottom:12px">💳 Rézime Finansye</div>'
+  +'<div style="display:flex;justify-content:space-between;font-size:13px;color:#374151;margin-bottom:6px"><span>Sous-total ('+CDATA.days+' jou)</span><span>'+fmt(CDATA.totalHtg)+' HTG</span></div>'
+  +'<div style="display:flex;justify-content:space-between;font-size:13px;color:#374151;margin-bottom:6px"><span>TCA (10%)</span><span>'+fmt(CDATA.tca)+' HTG</span></div>'
+  +'<div style="height:1px;background:#fecaca;margin:8px 0"></div>'
+  +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:#cc2222"><span>TOTAL JENERAL</span><span>'+fmt(CDATA.totalGen)+' HTG</span></div>'
+  +'</div>'
+
+  // Observations
+  +(CDATA.obs && CDATA.obs!=='Okenn obsèvasyon.'?
+    '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12.5px;color:#92400e"><b>📝 Obsèvasyon:</b><br>'+CDATA.obs+'</div>'
+  :'')
+
+  // Legal clause
+  +'<div style="font-size:10.5px;color:#9ca3af;line-height:1.8;margin-bottom:18px;padding:12px 16px;background:#f9fafb;border-radius:8px">'
+  +'Mwen soussiynen deklare aksepte kondisyon kontra lokasyon sa a ak tout responsabilite ki vini avèk li. Mwen dakò retounen veyikil la nan dat ak eta ki prevwa, epi peye tout frè siplemantè si sa nesesè. GMS Rent A Car pa responsab pou okenn aksidan oswa domaj ki rive pandan peryòd lokasyon an.'
+  +'</div>'
+
+  // Signature zones - placeholders for step 3
+  +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+  +'<div style="text-align:center">'
+  +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Siyati Lokatè</div>'
+  +'<div style="border:1.5px dashed #d1d5db;border-radius:8px;height:80px;display:flex;align-items:center;justify-content:center">'
+  +'<img id="preview-sig-client" style="max-height:72px;max-width:100%;display:none"/>'
+  +'<span id="preview-sig-client-empty" style="color:#d1d5db;font-size:11px;font-style:italic">Poko siyen</span>'
+  +'</div>'
+  +'<div style="font-size:10px;color:#9ca3af;margin-top:6px">'+CDATA.clientName+'</div>'
+  +'</div>'
+  +'<div style="text-align:center">'
+  +'<div style="font-size:11px;font-weight:600;color:#6b7280;margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Siyati GMS Rent A Car</div>'
+  +'<div style="border:1.5px dashed #d1d5db;border-radius:8px;height:80px;display:flex;align-items:center;justify-content:center">'
+  +'<img id="preview-sig-loueur" style="max-height:72px;max-width:100%;display:none"/>'
+  +'<span id="preview-sig-loueur-empty" style="color:#d1d5db;font-size:11px;font-style:italic">Poko siyen</span>'
+  +'</div>'
+  +'<div style="font-size:10px;color:#9ca3af;margin-top:6px">Ajã GMS</div>'
+  +'</div>'
+  +'</div>'
+
+  +'</div>' // body
+  +'</div>'; // outer
+
+  document.getElementById('contract-preview').innerHTML = html;
+}
+
+function cInfoCell(label, val) {
+  return '<div style="padding:10px 14px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb">'
+    +'<div style="font-size:10px;color:#9ca3af;margin-bottom:3px">'+label+'</div>'
+    +'<div style="font-size:12.5px;font-weight:600;color:#111827">'+val+'</div></div>';
+}
+
+// ── SIGNATURE PADS ──
+var SIG = {client: null, loueur: null};
+function initSigPads() {
+  ['client','loueur'].forEach(function(who){
+    var canvas = document.getElementById('sig-'+who);
+    if (!canvas || canvas._init) return;
+    canvas._init = true;
+    // Set actual pixel dimensions
+    var rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * (window.devicePixelRatio||1);
+    canvas.height = 160 * (window.devicePixelRatio||1);
+    var ctx = canvas.getContext('2d');
+    ctx.scale(window.devicePixelRatio||1, window.devicePixelRatio||1);
+    ctx.strokeStyle = '#111827';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    var drawing = false, lx=0, ly=0;
+    var hint = document.getElementById('sig-'+who+'-hint');
+
+    function getPos(e) {
+      var r = canvas.getBoundingClientRect();
+      var src = e.touches ? e.touches[0] : e;
+      return {x: src.clientX - r.left, y: src.clientY - r.top};
+    }
+    function down(e) {
+      e.preventDefault(); drawing=true;
+      var p=getPos(e); lx=p.x; ly=p.y;
+      ctx.beginPath(); ctx.arc(lx,ly,1.2,0,Math.PI*2); ctx.fill();
+      if(hint) hint.style.opacity='0';
+    }
+    function move(e) {
+      if(!drawing) return; e.preventDefault();
+      var p=getPos(e);
+      ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y); ctx.stroke();
+      lx=p.x; ly=p.y;
+    }
+    function up(e) { drawing=false; updateSigPreview(who); }
+
+    canvas.addEventListener('mousedown',down);
+    canvas.addEventListener('mousemove',move);
+    canvas.addEventListener('mouseup',up);
+    canvas.addEventListener('touchstart',down,{passive:false});
+    canvas.addEventListener('touchmove',move,{passive:false});
+    canvas.addEventListener('touchend',up);
+  });
+}
+
+function clearSig(who) {
+  var canvas = document.getElementById('sig-'+who);
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  SIG[who] = null;
+  var hint = document.getElementById('sig-'+who+'-hint');
+  if(hint) hint.style.opacity='1';
+  // Clear preview
+  var prev = document.getElementById('preview-sig-'+who);
+  var empty = document.getElementById('preview-sig-'+who+'-empty');
+  if(prev) prev.style.display='none';
+  if(empty) empty.style.display='block';
+}
+
+function updateSigPreview(who) {
+  var canvas = document.getElementById('sig-'+who);
+  if (!canvas) return;
+  var dataUrl = canvas.toDataURL('image/png');
+  SIG[who] = dataUrl;
+  // Update preview in contract
+  var prev = document.getElementById('preview-sig-'+who);
+  var empty = document.getElementById('preview-sig-'+who+'-empty');
+  if(prev) { prev.src=dataUrl; prev.style.display='block'; }
+  if(empty) empty.style.display='none';
+}
+
+async function cGeneratePDF() {
+  if (!SIG.client && !SIG.loueur) {
+    if (!confirm('Okenn siyati yo pa ajoute. Kontinye kanmenm?')) return;
+  }
+  var btn = document.getElementById('btn-gen-pdf');
+  btn.disabled=true; btn.textContent='⏳ Chajman...';
+
+  try {
+    // Count existing contracts for numbering
+    var num = 'CON-2026-001';
+    if (sbClient) {
+      var {data:existing} = await sbClient.from('contracts').select('id');
+      if (existing) {
+        var n = String(existing.length + 1).padStart(3,'0');
+        num = 'CON-'+new Date().getFullYear()+'-'+n;
+      }
+    }
+    CDATA.contractNum = num;
+
+    // Update contract number in preview
+    var prevEl = document.getElementById('contract-preview');
+    if (prevEl) {
+      prevEl.innerHTML = prevEl.innerHTML.replace('CON-'+new Date().getFullYear()+'-XXX', num);
+    }
+
+    // Update signatures in preview
+    if (SIG.client) updateSigPreview('client');
+    if (SIG.loueur) updateSigPreview('loueur');
+
+    // Generate PDF using html2canvas + jsPDF
+    if (typeof html2canvas !== 'undefined' && typeof jspdf !== 'undefined') {
+      var previewEl = document.getElementById('contract-preview');
+      var canvas = await html2canvas(previewEl, {
+        scale: 2, useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+      var imgData = canvas.toDataURL('image/jpeg', 0.92);
+      var {jsPDF} = jspdf;
+      var pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+      var pW = pdf.internal.pageSize.getWidth();
+      var pH = pdf.internal.pageSize.getHeight();
+      var ratio = canvas.height/canvas.width;
+      var iH = pW * ratio;
+      if (iH <= pH) {
+        pdf.addImage(imgData,'JPEG',0,0,pW,iH);
+      } else {
+        // Multi page
+        var pageH = pH;
+        var totalPages = Math.ceil(iH/pageH);
+        for (var p=0; p<totalPages; p++) {
+          if (p>0) pdf.addPage();
+          pdf.addImage(imgData,'JPEG',0,-p*pageH,pW,iH);
+        }
+      }
+      var pdfBlob = pdf.output('blob');
+      var pdfUrl = URL.createObjectURL(pdfBlob);
+
+      // Auto-download
+      var a = document.createElement('a');
+      a.href = pdfUrl; a.download = num+'.pdf'; a.click();
+
+      // Save to Supabase contracts table
+      if (sbClient) {
+        await sbClient.from('contracts').insert({
+          contract_number: num,
+          client_id: CDATA.clientId,
+          vehicle_id: CDATA.vehicleId,
+          start_date: CDATA.startDate,
+          end_date: CDATA.endDate,
+          duration_days: CDATA.days,
+          daily_price: CDATA.dailyPrice,
+          total_amount: CDATA.totalGen,
+          deposit_amount: CDATA.depot,
+          fuel_level: CDATA.fuel,
+          km_start: parseInt(CDATA.kmStart)||0,
+          km_per_day: CDATA.kmDay,
+          observations: CDATA.obs,
+          signature_client: SIG.client||null,
+          signature_loueur: SIG.loueur||null,
+          signed_at: new Date().toISOString(),
+          status: (SIG.client||SIG.loueur)?'signed':'draft'
+        });
+        addMsg('✅ Kontra '+num+' jenere ak siyen! PDF telechaje otomatikman.','ai');
+      }
+      alert('✅ Kontra '+num+' prè! PDF ap telechaje...');
+    } else {
+      // Fallback: open print dialog
+      var w = window.open('','_blank');
+      w.document.write('<html><body style="margin:0">');
+      w.document.write(document.getElementById('contract-preview').outerHTML);
+      w.document.write('</body></html>');
+      w.document.close();
+      w.print();
+    }
+  } catch(e) {
+    console.error(e);
+    alert('Erè: '+e.message);
+  }
+  btn.disabled=false; btn.innerHTML='📄 Jenere &amp; Sove PDF';
+}
+
+
 function getSess(){
   if(!localStorage.getItem('gms_sess'))
     localStorage.setItem('gms_sess','gms-'+Math.random().toString(36).slice(2));
@@ -988,16 +1541,19 @@ function vB(s){ var m={available:['bg','✓ Disponib'],rented:['bb','🔑 Louwe'
 
 </script>
 <script>
-function openMore(){document.getElementById("modal-more").classList.remove("hidden")}
-function closeMore(){document.getElementById("modal-more").classList.add("hidden")}
-document.getElementById("modal-more").addEventListener("click",function(e){if(e.target===this)closeMore()});
-document.getElementById("modal-cfg").addEventListener("click",function(e){if(e.target===this)closeCfg()});
-// Register service worker
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("sw.js").catch(function(){});
-}
-window.addEventListener("load",function(){initApp();});
+function openMore(){var m=document.getElementById("modal-more");if(m)m.classList.remove("hidden");}
+function closeMore(){var m=document.getElementById("modal-more");if(m)m.classList.add("hidden");}
+window.addEventListener("load",function(){
+  var mm=document.getElementById("modal-more");
+  if(mm)mm.addEventListener("click",function(e){if(e.target===this)closeMore();});
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js").catch(function(){});
+  }
+  initApp();
+});
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </body>
 </html>
