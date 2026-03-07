@@ -393,12 +393,7 @@ body{
         <span class="sb-badge">Beta</span>
       </div>
     </nav>
-    <div class="sb-foot">
-      <button class="sb-cfg" onclick="openCfg()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Paramèt
-      </button>
-    </div>
+
   </aside>
 
   <!-- ── MAIN ── -->
@@ -413,7 +408,7 @@ body{
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           Refraîchi
         </button>
-        <button class="tb-btn" onclick="openCfg()" style="display:none" id="tb-cfg-btn">⚙</button>
+        
       </div>
     </div>
 
@@ -655,43 +650,13 @@ body{
         </div>
         <svg style="margin-left:auto;color:#d1d5db" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
-      <div onclick="openCfg();closeMore()" style="display:flex;align-items:center;gap:12px;padding:13px 4px;cursor:pointer;-webkit-user-select:none">
-        <span style="font-size:22px">⚙️</span>
-        <span style="font-size:14px;font-weight:500;color:#111827">Paramèt Koneksyon</span>
-        <svg style="margin-left:auto;color:#d1d5db" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
+
     </div>
     <button class="btn-g" style="width:100%;margin-top:14px" onclick="closeMore()">Fèmen</button>
   </div>
 </div>
 
-<!-- CONFIG SHEET -->
-<div id="modal-cfg" class="ov hidden">
-  <div class="sheet" style="max-width:460px">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">⚙ Paramèt Koneksyon</div>
-    <div class="sheet-sub">Kòd admin obligatwa pou modifye paramèt yo.</div>
-    <div id="adm-gate">
-      <label class="lbl">Kòd Admin</label>
-      <div style="display:flex;gap:8px;margin-bottom:4px">
-        <input id="adm-inp" class="inp" type="password" placeholder="Antre kòd admin..."
-          onkeydown="if(event.key==='Enter')chkAdm()"/>
-        <button class="btn-r" style="flex-shrink:0;padding:11px 14px;border-radius:10px" onclick="chkAdm()">OK</button>
-      </div>
-      <p id="adm-err" style="font-size:11.5px;color:#dc2626;min-height:16px;margin-bottom:4px"></p>
-    </div>
-    <div id="cfg-fields" style="display:none;flex-direction:column;gap:12px">
-      <div><label class="lbl">Supabase URL</label><input id="cfg-url" class="inp" placeholder="https://xxxx.supabase.co"/></div>
-      <div><label class="lbl">Supabase Anon Key</label><input id="cfg-key" class="inp" type="password" placeholder="eyJhbGci..."/></div>
-      <div><label class="lbl">n8n Webhook URL</label><input id="cfg-n8n" class="inp" placeholder="https://n8n.../webhook/..."/></div>
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn-r" style="flex:1;border-radius:10px" onclick="saveCfg()">Sove & Konekte</button>
-        <button class="btn-g" onclick="closeCfg()">Anile</button>
-      </div>
-    </div>
-    <button id="cfg-close" class="btn-g" style="width:100%;margin-top:10px" onclick="closeCfg()">Fèmen</button>
-  </div>
-</div>
+
 
 <script>
 
@@ -704,9 +669,9 @@ var sbClient = null;
 var chatOpen = false;
 var CC = {clients:{}, vehicles:{}};
 var CFG = {
-  supabaseUrl: localStorage.getItem('gms_sb_url')||'',
-  supabaseKey: localStorage.getItem('gms_sb_key')||'',
-  n8nUrl:      localStorage.getItem('gms_n8n_url')||''
+  supabaseUrl: 'https://bbqpkhnpvlgkopulpnuq.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJicXBraG5wdmxna29wdWxwbnVxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjYyNDk1MCwiZXhwIjoyMDg4MjAwOTUwfQ.oY_5d2sP8essa-VPgr6Fd-lNvHcSsAfCrKG9BQN8Ir4',
+  n8nUrl:      'https://n8n-dosq.onrender.com/webhook/098444ce-0bc5-4735-99be-4f9ed2d516a2/chat'
 };
 
 // ── APP INIT ───────────────────────────────────────────────────────────────
@@ -730,15 +695,8 @@ function initSb() {
 }
 
 // ── ADMIN / CONFIG ─────────────────────────────────────────────────────────
-function openCfg() {
-  document.getElementById('adm-gate').style.display = 'block';
-  document.getElementById('adm-err').textContent = '';
-  document.getElementById('adm-inp').value = '';
-  document.getElementById('cfg-fields').style.display = 'none';
-  document.getElementById('cfg-close').style.display = 'block';
-  document.getElementById('modal-cfg').classList.remove('hidden');
-}
-function closeCfg() { document.getElementById('modal-cfg').classList.add('hidden'); }
+function openCfg() {}
+function closeCfg() {}
 function chkAdm() {
   if (document.getElementById('adm-inp').value === ADMIN) {
     document.getElementById('adm-gate').style.display = 'none';
